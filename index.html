@@ -67,11 +67,10 @@
     }
 
     #loadingScreen {
-      display: none;
+      display: flex;
       position: fixed;
       inset: 0;
       z-index: 10;
-      pointer-events: none;
     }
 
     .setup-card {
@@ -115,140 +114,32 @@
       color: var(--white);
     }
 
-    #unlockScreen {
-      position: fixed;
-      inset: 0;
-      z-index: 20;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 22px;
-      background: var(--black);
+    #biometricGate,
+    #biometricSetup {
+      position: fixed; inset: 0; z-index: 50; display: none;
+      align-items: center; justify-content: center; padding: 22px;
+      background: #0b0b0b;
     }
-
-    .unlock-card {
-      width: 100%;
-      max-width: 430px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 26px;
+    .security-card {
+      width: 100%; max-width: 430px; background: #171717;
+      border: 1px solid #343434; border-radius: 18px; padding: 26px;
       text-align: center;
     }
-
-    .unlock-card .logo {
-      width: min(210px, 65vw);
-      max-height: 155px;
+    .security-logo {
+      width: min(190px,60vw); max-height: 145px; display:block;
+      object-fit:contain; margin:0 auto 14px;
     }
-
-    .unlock-button,
-    .pin-button {
-      width: 100%;
-      border-radius: 12px;
-      padding: 14px 16px;
-      font-weight: 900;
-      font-size: 15px;
-      cursor: pointer;
+    .security-card h1 { margin:0 0 10px; color:#f4c430; font-size:24px; }
+    .security-card p { margin:0; color:#b8b8b8; line-height:1.5; }
+    .security-actions { display:grid; gap:10px; margin-top:18px; }
+    .security-primary,.security-secondary,.security-link {
+      width:100%; border-radius:12px; padding:14px 16px;
+      font-weight:900; font-size:14px; cursor:pointer;
     }
-
-    .unlock-button {
-      margin-top: 18px;
-      border: 0;
-      background: var(--yellow);
-      color: #000;
-    }
-
-    .pin-button {
-      margin-top: 10px;
-      border: 1px solid var(--border);
-      background: #222;
-      color: var(--white);
-    }
-
-    #unlockMessage {
-      min-height: 20px;
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.4;
-    }
-
-
-    #biometricSetupScreen {
-      position: fixed;
-      inset: 0;
-      z-index: 40;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 22px;
-      background: rgba(11, 11, 11, 0.98);
-    }
-
-    .biometric-setup-card {
-      width: 100%;
-      max-width: 430px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 26px;
-      text-align: center;
-    }
-
-    .biometric-setup-card img {
-      width: min(190px, 60vw);
-      max-height: 145px;
-      object-fit: contain;
-      margin-bottom: 14px;
-    }
-
-    .biometric-setup-card h1 {
-      margin: 0 0 10px;
-      color: var(--yellow);
-      font-size: 24px;
-    }
-
-    .biometric-setup-card p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .biometric-setup-actions {
-      display: grid;
-      gap: 10px;
-      margin-top: 18px;
-    }
-
-    .biometric-setup-primary,
-    .biometric-setup-secondary {
-      width: 100%;
-      border-radius: 12px;
-      padding: 14px 16px;
-      font-weight: 900;
-      font-size: 15px;
-      cursor: pointer;
-    }
-
-    .biometric-setup-primary {
-      border: 0;
-      background: var(--yellow);
-      color: #000;
-    }
-
-    .biometric-setup-secondary {
-      border: 1px solid var(--border);
-      background: #222;
-      color: var(--white);
-    }
-
-    #biometricSetupMessage {
-      min-height: 20px;
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.4;
-    }
+    .security-primary { border:0; background:#f4c430; color:#000; }
+    .security-secondary { border:1px solid #444; background:#222; color:#fff; }
+    .security-link { border:0; background:transparent; color:#b8b8b8; padding:9px 12px; }
+    .security-message { min-height:20px; margin-top:12px; color:#b8b8b8; font-size:13px; line-height:1.4; }
 
   </style>
 </head>
@@ -263,120 +154,36 @@
   </div>
 
 
-
-  <div id="biometricSetupScreen">
-    <div class="biometric-setup-card">
-      <img
-        src="./tf-fitness-logo.png"
-        alt="TF Fitness"
-      >
-
-      <h1>Enable secure unlock</h1>
-
-      <p>
-        Use your phone fingerprint, face or device screen lock to protect
-        the remembered TF Fitness Rota session.
-      </p>
-
-      <div class="biometric-setup-actions">
-        <button
-          id="confirmBiometricSetupButton"
-          class="biometric-setup-primary"
-          type="button"
-        >
-          ENABLE FINGERPRINT / DEVICE UNLOCK
-        </button>
-
-        <button
-          id="cancelBiometricSetupButton"
-          class="biometric-setup-secondary"
-          type="button"
-        >
-          CANCEL
-        </button>
+  <div id="biometricGate">
+    <div class="security-card">
+      <img class="security-logo" src="./tf-fitness-logo.png" alt="TF Fitness">
+      <h1>TF Fitness Rota</h1>
+      <p>Unlock the app with your fingerprint, face or device screen lock.</p>
+      <div class="security-actions">
+        <button id="biometricUnlockButton" class="security-primary" type="button">UNLOCK WITH FINGERPRINT / DEVICE</button>
+        <button id="disableBiometricButton" class="security-link" type="button">Disable biometric unlock</button>
       </div>
-
-      <div id="biometricSetupMessage"></div>
+      <div id="biometricGateMessage" class="security-message"></div>
     </div>
   </div>
 
-  <div id="unlockScreen">
-    <div class="unlock-card">
-      <img
-        class="logo"
-        src="./tf-fitness-logo.png"
-        alt="TF Fitness"
-      >
-
-      <h1>Welcome back</h1>
-
-      <p>
-        Unlock your remembered TF Fitness Rota session with your
-        fingerprint, face or device screen lock.
-      </p>
-
-      <button
-        id="unlockButton"
-        class="unlock-button"
-        type="button"
-      >
-        UNLOCK WITH FINGERPRINT / DEVICE
-      </button>
-
-      <button
-        id="usePinButton"
-        class="pin-button"
-        type="button"
-      >
-        USE STAFF ID + PIN
-      </button>
-
-      <div id="unlockMessage"></div>
+  <div id="biometricSetup">
+    <div class="security-card">
+      <img class="security-logo" src="./tf-fitness-logo.png" alt="TF Fitness">
+      <h1>Secure your TF Rota app</h1>
+      <p>You can protect the installed app with your fingerprint, face or device screen lock. Your rota PIN is not stored by this.</p>
+      <div class="security-actions">
+        <button id="setupBiometricButton" class="security-primary" type="button">ENABLE FINGERPRINT / DEVICE UNLOCK</button>
+        <button id="skipBiometricButton" class="security-secondary" type="button">NOT NOW</button>
+      </div>
+      <div id="biometricSetupMessage" class="security-message"></div>
     </div>
-  </div>
-
-
-  <div
-    id="frameFallback"
-    style="
-      display:none;
-      position:fixed;
-      left:12px;
-      right:12px;
-      bottom:12px;
-      z-index:30;
-      background:#171717;
-      border:1px solid #343434;
-      border-radius:12px;
-      padding:12px;
-      color:#fff;
-      font-family:Arial,Helvetica,sans-serif;
-      font-size:13px;
-      line-height:1.4;
-    "
-  >
-    The rota is taking longer than expected to load.
-    <button
-      id="openDirectRotaButton"
-      type="button"
-      style="
-        margin-left:8px;
-        border:0;
-        border-radius:8px;
-        background:#f4c430;
-        color:#000;
-        padding:8px 10px;
-        font-weight:900;
-      "
-    >
-      OPEN ROTA
-    </button>
   </div>
 
   <iframe
     id="appFrame"
     title="TF Fitness Staff Rota"
-    allow="fullscreen; clipboard-read; clipboard-write; publickey-credentials-get *; publickey-credentials-create *"
+    allow="fullscreen; clipboard-read; clipboard-write"
   ></iframe>
 
   <div id="setupScreen">
@@ -399,786 +206,193 @@
   <script src="./config.js"></script>
 
   <script>
-    const APP_URL =
-      String(window.TF_ROTA_APP_URL || "").trim();
+    const APP_URL = String(window.TF_ROTA_APP_URL || "").trim();
+    const BIO_ENABLED_KEY = "tfRotaBiometricGateEnabled";
+    const BIO_CREDENTIAL_KEY = "tfRotaBiometricGateCredential";
+    const BIO_PROMPT_KEY = "tfRotaBiometricPromptSeen";
 
-    const REMEMBERED_TOKEN_KEY =
-      "tfRotaRememberedToken";
+    const appFrame = document.getElementById("appFrame");
+    const setupScreen = document.getElementById("setupScreen");
+    const loadingScreen = document.getElementById("loadingScreen");
+    const biometricGate = document.getElementById("biometricGate");
+    const biometricSetup = document.getElementById("biometricSetup");
+    const biometricUnlockButton = document.getElementById("biometricUnlockButton");
+    const disableBiometricButton = document.getElementById("disableBiometricButton");
+    const setupBiometricButton = document.getElementById("setupBiometricButton");
+    const skipBiometricButton = document.getElementById("skipBiometricButton");
+    const biometricGateMessage = document.getElementById("biometricGateMessage");
+    const biometricSetupMessage = document.getElementById("biometricSetupMessage");
 
-    const BIOMETRIC_ENABLED_KEY =
-      "tfRotaBiometricEnabled";
+    const isConfigured = APP_URL && !APP_URL.includes("PASTE_YOUR_EXISTING_ROTA_WEB_APP_URL_HERE");
 
-    const BIOMETRIC_CREDENTIAL_KEY =
-      "tfRotaBiometricCredential";
-
-    const appFrame =
-      document.getElementById("appFrame");
-
-    const setupScreen =
-      document.getElementById("setupScreen");
-
-    const loadingScreen =
-      document.getElementById("loadingScreen");
-
-    const unlockScreen =
-      document.getElementById("unlockScreen");
-
-    const unlockButton =
-      document.getElementById("unlockButton");
-
-    const usePinButton =
-      document.getElementById("usePinButton");
-
-    const unlockMessage =
-      document.getElementById("unlockMessage");
-
-    const biometricSetupScreen =
-      document.getElementById("biometricSetupScreen");
-
-    const confirmBiometricSetupButton =
-      document.getElementById("confirmBiometricSetupButton");
-
-    const cancelBiometricSetupButton =
-      document.getElementById("cancelBiometricSetupButton");
-
-    const biometricSetupMessage =
-      document.getElementById("biometricSetupMessage");
-
-    let pendingBiometricSetup = null;
-    let platformAuthenticatorAvailable = false;
-
-    const frameFallback =
-      document.getElementById("frameFallback");
-
-    const openDirectRotaButton =
-      document.getElementById("openDirectRotaButton");
-
-    let frameReady = false;
-
-    const isConfigured =
-      APP_URL &&
-      !APP_URL.includes(
-        "PASTE_YOUR_EXISTING_ROTA_WEB_APP_URL_HERE"
-      );
-
-    function biometricApiSupported() {
-      return (
-        window.isSecureContext &&
-        "PublicKeyCredential" in window &&
-        navigator.credentials
-      );
+    function apiAvailable() {
+      return window.isSecureContext && "PublicKeyCredential" in window && navigator.credentials;
     }
 
-
-    async function detectPlatformAuthenticator() {
-      if (!biometricApiSupported()) {
-        platformAuthenticatorAvailable =
-          false;
-
-        return false;
-      }
-
+    async function platformAuthenticatorAvailable() {
+      if (!apiAvailable()) return false;
       try {
-        if (
-          typeof PublicKeyCredential
-            .isUserVerifyingPlatformAuthenticatorAvailable ===
-          "function"
-        ) {
-          platformAuthenticatorAvailable =
-            await PublicKeyCredential
-              .isUserVerifyingPlatformAuthenticatorAvailable();
-
-          return platformAuthenticatorAvailable;
+        if (typeof PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === "function") {
+          return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
         }
-
-        platformAuthenticatorAvailable =
-          true;
-
         return true;
       } catch (error) {
-        platformAuthenticatorAvailable =
-          false;
-
         return false;
       }
     }
 
-
-    function biometricSupported() {
-      return (
-        biometricApiSupported() &&
-        platformAuthenticatorAvailable
-      );
-    }
-
-
-    function getRememberedToken() {
-      return (
-        localStorage.getItem(
-          REMEMBERED_TOKEN_KEY
-        ) || ""
-      );
-    }
-
-
-    function biometricEnabled() {
-      return (
-        localStorage.getItem(
-          BIOMETRIC_ENABLED_KEY
-        ) === "true" &&
-        !!localStorage.getItem(
-          BIOMETRIC_CREDENTIAL_KEY
-        )
-      );
-    }
-
-
-    function sendToRota(payload) {
-      if (
-        !appFrame.contentWindow
-      ) {
-        return;
-      }
-
-      appFrame.contentWindow.postMessage(
-        payload,
-        "*"
-      );
-    }
-
-
-    function sendShellReady() {
-      sendToRota({
-        type: "TF_ROTA_SHELL_READY"
-      });
-
-      sendBiometricStatus();
-    }
-
-
-    function sendBiometricStatus(
-      message,
-      ok
-    ) {
-      sendToRota({
-        type: "TF_ROTA_BIOMETRIC_STATUS",
-        supported:
-          biometricSupported(),
-        enabled:
-          biometricEnabled(),
-        hasToken:
-          !!getRememberedToken(),
-        message:
-          message || "",
-        ok:
-          ok !== false
-      });
-    }
-
-
-    function maybeReleaseRememberedToken() {
-      const token =
-        getRememberedToken();
-
-      if (!token) {
-        loadingScreen.style.display =
-          "none";
-
-        unlockScreen.style.display =
-          "none";
-
-        return;
-      }
-
-      if (
-        biometricEnabled()
-      ) {
-        loadingScreen.style.display =
-          "none";
-
-        unlockScreen.style.display =
-          "flex";
-
-        return;
-      }
-
-      loadingScreen.style.display =
-        "none";
-
-      unlockScreen.style.display =
-        "none";
-
-      sendToRota({
-        type: "TF_ROTA_REMEMBERED_TOKEN",
-        token: token
-      });
-    }
-
-
-    function bytesToBase64Url(bytes) {
-      let binary = "";
-
-      bytes.forEach(function(byte) {
-        binary +=
-          String.fromCharCode(byte);
-      });
-
-      return btoa(binary)
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/g, "");
-    }
-
-
-    function base64UrlToBytes(value) {
-      let input =
-        String(value || "")
-          .replace(/-/g, "+")
-          .replace(/_/g, "/");
-
-      while (
-        input.length % 4
-      ) {
-        input += "=";
-      }
-
-      const binary =
-        atob(input);
-
-      const bytes =
-        new Uint8Array(
-          binary.length
-        );
-
-      for (
-        let i = 0;
-        i < binary.length;
-        i++
-      ) {
-        bytes[i] =
-          binary.charCodeAt(i);
-      }
-
+    function randomChallenge() {
+      const bytes = new Uint8Array(32);
+      crypto.getRandomValues(bytes);
       return bytes;
     }
 
-
-    function randomChallenge() {
-      const value =
-        new Uint8Array(32);
-
-      crypto.getRandomValues(
-        value
-      );
-
-      return value;
+    function bytesToBase64Url(bytes) {
+      let binary = "";
+      bytes.forEach(function(byte) { binary += String.fromCharCode(byte); });
+      return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g,"");
     }
 
-
-    async function completeBiometricSetup(
-      data
-    ) {
-      const available =
-        await detectPlatformAuthenticator();
-
-      if (!available) {
-        biometricSetupMessage.textContent =
-          "This browser/device is not reporting a fingerprint, face or other secure platform authenticator.";
-
-        sendBiometricStatus(
-          "Biometric/device unlock is not available on this device/browser.",
-          false
-        );
-
-        return;
-      }
-
-      const token =
-        String(data.token || "");
-
-      if (!token) {
-        sendBiometricStatus(
-          "No remembered session is available. Sign in again first.",
-          false
-        );
-        return;
-      }
-
-      try {
-        const staffId =
-          String(
-            data.staffId ||
-            "tf-rota-user"
-          );
-
-        const displayName =
-          String(
-            data.displayName ||
-            staffId
-          );
-
-        const userId =
-          new TextEncoder()
-            .encode(staffId)
-            .slice(0, 64);
-
-        const credential =
-          await navigator.credentials.create({
-            publicKey: {
-              challenge:
-                randomChallenge(),
-              rp: {
-                name:
-                  "TF Fitness Rota"
-              },
-              user: {
-                id: userId,
-                name: staffId,
-                displayName:
-                  displayName
-              },
-              pubKeyCredParams: [
-                {
-                  type: "public-key",
-                  alg: -7
-                },
-                {
-                  type: "public-key",
-                  alg: -257
-                }
-              ],
-              authenticatorSelection: {
-                authenticatorAttachment:
-                  "platform",
-                residentKey:
-                  "discouraged",
-                userVerification:
-                  "required"
-              },
-              timeout: 60000,
-              attestation: "none"
-            }
-          });
-
-        if (!credential) {
-          throw new Error(
-            "Device unlock was not completed."
-          );
-        }
-
-        localStorage.setItem(
-          REMEMBERED_TOKEN_KEY,
-          token
-        );
-
-        localStorage.setItem(
-          BIOMETRIC_CREDENTIAL_KEY,
-          bytesToBase64Url(
-            new Uint8Array(
-              credential.rawId
-            )
-          )
-        );
-
-        localStorage.setItem(
-          BIOMETRIC_ENABLED_KEY,
-          "true"
-        );
-
-        sendBiometricStatus(
-          "Biometric/device unlock is now enabled.",
-          true
-        );
-      } catch (error) {
-        const name =
-          error && error.name
-            ? error.name
-            : "Error";
-
-        biometricSetupMessage.textContent =
-          "Setup did not complete (" +
-          name +
-          "). You can try again.";
-
-        sendBiometricStatus(
-          "Biometric setup did not complete (" +
-          name +
-          ").",
-          false
-        );
-      }
+    function base64UrlToBytes(value) {
+      let input = String(value || "").replace(/-/g,"+").replace(/_/g,"/");
+      while (input.length % 4) input += "=";
+      const binary = atob(input);
+      const bytes = new Uint8Array(binary.length);
+      for (let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+      return bytes;
     }
 
-
-    async function performBiometricUnlock() {
-      if (
-        !biometricSupported() ||
-        !biometricEnabled()
-      ) {
-        unlockMessage.textContent =
-          "Biometric/device unlock is not available. Use Staff ID + PIN.";
-
-        sendToRota({
-          type:
-            "TF_ROTA_BIOMETRIC_ERROR",
-          message:
-            "Biometric/device unlock is not available."
-        });
-
-        return;
-      }
-
-      const token =
-        getRememberedToken();
-
-      if (!token) {
-        unlockScreen.style.display =
-          "none";
-
-        sendBiometricStatus();
-        return;
-      }
-
-      unlockButton.disabled = true;
-      unlockButton.textContent =
-        "WAITING FOR DEVICE...";
-
-      unlockMessage.textContent =
-        "Use your fingerprint, face or device screen lock.";
-
-      try {
-        const credentialId =
-          base64UrlToBytes(
-            localStorage.getItem(
-              BIOMETRIC_CREDENTIAL_KEY
-            )
-          );
-
-        const assertion =
-          await navigator.credentials.get({
-            publicKey: {
-              challenge:
-                randomChallenge(),
-              allowCredentials: [
-                {
-                  type:
-                    "public-key",
-                  id:
-                    credentialId
-                }
-              ],
-              userVerification:
-                "required",
-              timeout:
-                60000
-            }
-          });
-
-        if (!assertion) {
-          throw new Error(
-            "Device unlock was not completed."
-          );
-        }
-
-        unlockMessage.textContent = "";
-        unlockScreen.style.display =
-          "none";
-
-        sendToRota({
-          type:
-            "TF_ROTA_REMEMBERED_TOKEN",
-          token:
-            token
-        });
-      } catch (error) {
-        unlockMessage.textContent =
-          "Device unlock was cancelled. Try again or use Staff ID + PIN.";
-
-        sendToRota({
-          type:
-            "TF_ROTA_BIOMETRIC_ERROR",
-          message:
-            "Device unlock was cancelled."
-        });
-      } finally {
-        unlockButton.disabled = false;
-        unlockButton.textContent =
-          "UNLOCK WITH FINGERPRINT / DEVICE";
-      }
+    function biometricEnabled() {
+      return localStorage.getItem(BIO_ENABLED_KEY) === "true" && !!localStorage.getItem(BIO_CREDENTIAL_KEY);
     }
 
-
-    detectPlatformAuthenticator()
-      .then(function() {
-        sendBiometricStatus();
-      });
-
-
-    if (!isConfigured) {
-      loadingScreen.style.display =
-        "none";
-
-      appFrame.style.display =
-        "none";
-
-      setupScreen.style.display =
-        "flex";
-    } else {
-      appFrame.addEventListener(
-        "load",
-        function() {
-          frameReady = true;
-
-          frameFallback.style.display =
-            "none";
-
-          loadingScreen.style.display =
-            "none";
-
-          appFrame.style.display =
-            "block";
-
-          sendShellReady();
-
-          window.setTimeout(
-            maybeReleaseRememberedToken,
-            250
-          );
-        }
-      );
-
-      appFrame.style.display = "block";
+    function revealRota() {
+      biometricGate.style.display = "none";
+      biometricSetup.style.display = "none";
       loadingScreen.style.display = "none";
+      appFrame.style.display = "block";
+    }
+
+    async function createBiometricCredential() {
+      const available = await platformAuthenticatorAvailable();
+      if (!available) throw new Error("This device/browser is not reporting a compatible fingerprint, face or device-unlock authenticator.");
+      const userId = new TextEncoder().encode("tf-rota-" + Date.now()).slice(0,64);
+      const credential = await navigator.credentials.create({
+        publicKey: {
+          challenge: randomChallenge(),
+          rp: { name: "TF Fitness Rota" },
+          user: { id: userId, name: "tf-rota-user", displayName: "TF Fitness Rota User" },
+          pubKeyCredParams: [{type:"public-key",alg:-7},{type:"public-key",alg:-257}],
+          authenticatorSelection: { authenticatorAttachment:"platform", residentKey:"discouraged", userVerification:"required" },
+          timeout: 60000,
+          attestation: "none"
+        }
+      });
+      if (!credential) throw new Error("Device unlock setup did not complete.");
+      localStorage.setItem(BIO_CREDENTIAL_KEY, bytesToBase64Url(new Uint8Array(credential.rawId)));
+      localStorage.setItem(BIO_ENABLED_KEY, "true");
+      localStorage.setItem(BIO_PROMPT_KEY, "true");
+    }
+
+    async function unlockWithBiometric() {
+      const available = await platformAuthenticatorAvailable();
+      if (!available) throw new Error("Fingerprint/device unlock is not available on this device/browser.");
+      const credentialId = localStorage.getItem(BIO_CREDENTIAL_KEY);
+      if (!credentialId) throw new Error("No biometric credential is stored for this app.");
+      const assertion = await navigator.credentials.get({
+        publicKey: {
+          challenge: randomChallenge(),
+          allowCredentials: [{type:"public-key",id:base64UrlToBytes(credentialId)}],
+          userVerification: "required",
+          timeout: 60000
+        }
+      });
+      if (!assertion) throw new Error("Device unlock did not complete.");
+      revealRota();
+    }
+
+    setupBiometricButton.addEventListener("click", async function() {
+      setupBiometricButton.disabled = true;
+      setupBiometricButton.textContent = "WAITING FOR DEVICE...";
+      biometricSetupMessage.textContent = "Follow your fingerprint, face or screen-lock prompt.";
+      try {
+        await createBiometricCredential();
+        biometricSetupMessage.textContent = "Fingerprint/device unlock enabled.";
+        window.setTimeout(revealRota,500);
+      } catch (error) {
+        biometricSetupMessage.textContent = error && error.message ? error.message : "Biometric setup did not complete.";
+      } finally {
+        setupBiometricButton.disabled = false;
+        setupBiometricButton.textContent = "ENABLE FINGERPRINT / DEVICE UNLOCK";
+      }
+    });
+
+    skipBiometricButton.addEventListener("click", function() {
+      localStorage.setItem(BIO_PROMPT_KEY,"true");
+      revealRota();
+    });
+
+    biometricUnlockButton.addEventListener("click", async function() {
+      biometricUnlockButton.disabled = true;
+      biometricUnlockButton.textContent = "WAITING FOR DEVICE...";
+      biometricGateMessage.textContent = "Use your fingerprint, face or device screen lock.";
+      try {
+        await unlockWithBiometric();
+        biometricGateMessage.textContent = "";
+      } catch (error) {
+        biometricGateMessage.textContent = error && error.message ? error.message : "Device unlock did not complete.";
+      } finally {
+        biometricUnlockButton.disabled = false;
+        biometricUnlockButton.textContent = "UNLOCK WITH FINGERPRINT / DEVICE";
+      }
+    });
+
+    disableBiometricButton.addEventListener("click", function() {
+      const confirmed = window.confirm("Disable fingerprint/device unlock for the TF Rota app?");
+      if (!confirmed) return;
+      localStorage.removeItem(BIO_ENABLED_KEY);
+      localStorage.removeItem(BIO_CREDENTIAL_KEY);
+      revealRota();
+    });
+
+    async function startApp() {
+      if (!isConfigured) {
+        loadingScreen.style.display = "none";
+        appFrame.style.display = "none";
+        setupScreen.style.display = "flex";
+        return;
+      }
+
       appFrame.src = APP_URL;
 
-      // Safety fallback: never leave the user stuck behind a splash screen.
-      window.setTimeout(function() {
+      if (biometricEnabled()) {
+        appFrame.style.display = "none";
         loadingScreen.style.display = "none";
-        appFrame.style.display = "block";
-      }, 1500);
+        biometricGate.style.display = "flex";
+        return;
+      }
+
+      const promptSeen = localStorage.getItem(BIO_PROMPT_KEY) === "true";
+      const available = await platformAuthenticatorAvailable();
+
+      if (!promptSeen && available) {
+        appFrame.style.display = "none";
+        loadingScreen.style.display = "none";
+        biometricSetup.style.display = "flex";
+        return;
+      }
+
+      revealRota();
     }
 
-
-    confirmBiometricSetupButton.addEventListener(
-      "click",
-      async function() {
-        if (!pendingBiometricSetup) {
-          biometricSetupMessage.textContent =
-            "Please return to the rota and start biometric setup again.";
-          return;
-        }
-
-        confirmBiometricSetupButton.disabled =
-          true;
-
-        confirmBiometricSetupButton.textContent =
-          "WAITING FOR DEVICE...";
-
-        biometricSetupMessage.textContent =
-          "Follow your fingerprint, face or screen-lock prompt.";
-
-        await completeBiometricSetup(
-          pendingBiometricSetup
-        );
-
-        if (biometricEnabled()) {
-          biometricSetupScreen.style.display =
-            "none";
-
-          pendingBiometricSetup = null;
-        }
-
-        confirmBiometricSetupButton.disabled =
-          false;
-
-        confirmBiometricSetupButton.textContent =
-          "ENABLE FINGERPRINT / DEVICE UNLOCK";
-      }
-    );
-
-
-    cancelBiometricSetupButton.addEventListener(
-      "click",
-      function() {
-        pendingBiometricSetup = null;
-
-        biometricSetupMessage.textContent =
-          "";
-
-        biometricSetupScreen.style.display =
-          "none";
-      }
-    );
-
-
-    window.setTimeout(function() {
-      if (
-        isConfigured &&
-        !frameReady
-      ) {
-        frameFallback.style.display =
-          "block";
-      }
-    }, 8000);
-
-
-    openDirectRotaButton.addEventListener(
-      "click",
-      function() {
-        window.location.href =
-          APP_URL;
-      }
-    );
-
-
-    unlockButton.addEventListener(
-      "click",
-      performBiometricUnlock
-    );
-
-
-    usePinButton.addEventListener(
-      "click",
-      function() {
-        unlockMessage.textContent = "";
-        unlockScreen.style.display =
-          "none";
-
-        sendBiometricStatus();
-      }
-    );
-
-
-    window.addEventListener(
-      "message",
-      function(event) {
-        if (
-          event.source !==
-          appFrame.contentWindow
-        ) {
-          return;
-        }
-
-        const data =
-          event.data || {};
-
-        if (
-          data.type ===
-          "TF_ROTA_IFRAME_READY"
-        ) {
-          frameReady = true;
-          sendShellReady();
-          maybeReleaseRememberedToken();
-          return;
-        }
-
-        if (
-          data.type ===
-          "TF_ROTA_STATUS_REQUEST"
-        ) {
-          sendBiometricStatus();
-          return;
-        }
-
-        if (
-          data.type ===
-          "TF_ROTA_STORE_REMEMBERED_TOKEN"
-        ) {
-          localStorage.setItem(
-            REMEMBERED_TOKEN_KEY,
-            String(
-              data.token || ""
-            )
-          );
-
-          sendBiometricStatus();
-          return;
-        }
-
-        if (
-          data.type ===
-          "TF_ROTA_CLEAR_REMEMBERED_TOKEN"
-        ) {
-          localStorage.removeItem(
-            REMEMBERED_TOKEN_KEY
-          );
-
-          sendBiometricStatus();
-          return;
-        }
-
-        if (
-          data.type ===
-          "TF_ROTA_ENABLE_BIOMETRIC"
-        ) {
-          pendingBiometricSetup = {
-            token:
-              String(data.token || ""),
-            staffId:
-              String(data.staffId || ""),
-            displayName:
-              String(data.displayName || "")
-          };
-
-          biometricSetupMessage.textContent =
-            "";
-
-          biometricSetupScreen.style.display =
-            "flex";
-
-          return;
-        }
-
-        if (
-          data.type ===
-          "TF_ROTA_DISABLE_BIOMETRIC"
-        ) {
-          localStorage.removeItem(
-            BIOMETRIC_ENABLED_KEY
-          );
-
-          localStorage.removeItem(
-            BIOMETRIC_CREDENTIAL_KEY
-          );
-
-          sendBiometricStatus(
-            "Biometric/device unlock has been disabled.",
-            true
-          );
-
-          return;
-        }
-
-        if (
-          data.type ===
-          "TF_ROTA_BIOMETRIC_UNLOCK_REQUEST"
-        ) {
-          unlockMessage.textContent =
-            "";
-
-          unlockScreen.style.display =
-            "flex";
-        }
-      }
-    );
-
+    startApp();
 
     if ("serviceWorker" in navigator) {
-      window.addEventListener(
-        "load",
-        function() {
-          navigator.serviceWorker
-            .register(
-              "./service-worker.js"
-            )
-            .catch(function(error) {
-              console.error(
-                "Service worker registration failed:",
-                error
-              );
-            });
-        }
-      );
+      window.addEventListener("load", function() {
+        navigator.serviceWorker.register("./service-worker.js").catch(function(error) {
+          console.error("Service worker registration failed:", error);
+        });
+      });
     }
   </script>
 </body>
