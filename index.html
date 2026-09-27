@@ -173,6 +173,83 @@
       line-height: 1.4;
     }
 
+
+    #biometricSetupScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(11, 11, 11, 0.98);
+    }
+
+    .biometric-setup-card {
+      width: 100%;
+      max-width: 430px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 26px;
+      text-align: center;
+    }
+
+    .biometric-setup-card img {
+      width: min(190px, 60vw);
+      max-height: 145px;
+      object-fit: contain;
+      margin-bottom: 14px;
+    }
+
+    .biometric-setup-card h1 {
+      margin: 0 0 10px;
+      color: var(--yellow);
+      font-size: 24px;
+    }
+
+    .biometric-setup-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .biometric-setup-actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .biometric-setup-primary,
+    .biometric-setup-secondary {
+      width: 100%;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-weight: 900;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .biometric-setup-primary {
+      border: 0;
+      background: var(--yellow);
+      color: #000;
+    }
+
+    .biometric-setup-secondary {
+      border: 1px solid var(--border);
+      background: #222;
+      color: var(--white);
+    }
+
+    #biometricSetupMessage {
+      min-height: 20px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
   </style>
 </head>
 
@@ -185,6 +262,43 @@
     >
   </div>
 
+
+
+  <div id="biometricSetupScreen">
+    <div class="biometric-setup-card">
+      <img
+        src="./tf-fitness-logo.png"
+        alt="TF Fitness"
+      >
+
+      <h1>Enable secure unlock</h1>
+
+      <p>
+        Use your phone fingerprint, face or device screen lock to protect
+        the remembered TF Fitness Rota session.
+      </p>
+
+      <div class="biometric-setup-actions">
+        <button
+          id="confirmBiometricSetupButton"
+          class="biometric-setup-primary"
+          type="button"
+        >
+          ENABLE FINGERPRINT / DEVICE UNLOCK
+        </button>
+
+        <button
+          id="cancelBiometricSetupButton"
+          class="biometric-setup-secondary"
+          type="button"
+        >
+          CANCEL
+        </button>
+      </div>
+
+      <div id="biometricSetupMessage"></div>
+    </div>
+  </div>
 
   <div id="unlockScreen">
     <div class="unlock-card">
@@ -318,6 +432,21 @@
     const unlockMessage =
       document.getElementById("unlockMessage");
 
+    const biometricSetupScreen =
+      document.getElementById("biometricSetupScreen");
+
+    const confirmBiometricSetupButton =
+      document.getElementById("confirmBiometricSetupButton");
+
+    const cancelBiometricSetupButton =
+      document.getElementById("cancelBiometricSetupButton");
+
+    const biometricSetupMessage =
+      document.getElementById("biometricSetupMessage");
+
+    let pendingBiometricSetup = null;
+    let platformAuthenticatorAvailable = false;
+
     const frameFallback =
       document.getElementById("frameFallback");
 
@@ -332,11 +461,53 @@
         "PASTE_YOUR_EXISTING_ROTA_WEB_APP_URL_HERE"
       );
 
-    function biometricSupported() {
+    function biometricApiSupported() {
       return (
         window.isSecureContext &&
         "PublicKeyCredential" in window &&
         navigator.credentials
+      );
+    }
+
+
+    async function detectPlatformAuthenticator() {
+      if (!biometricApiSupported()) {
+        platformAuthenticatorAvailable =
+          false;
+
+        return false;
+      }
+
+      try {
+        if (
+          typeof PublicKeyCredential
+            .isUserVerifyingPlatformAuthenticatorAvailable ===
+          "function"
+        ) {
+          platformAuthenticatorAvailable =
+            await PublicKeyCredential
+              .isUserVerifyingPlatformAuthenticatorAvailable();
+
+          return platformAuthenticatorAvailable;
+        }
+
+        platformAuthenticatorAvailable =
+          true;
+
+        return true;
+      } catch (error) {
+        platformAuthenticatorAvailable =
+          false;
+
+        return false;
+      }
+    }
+
+
+    function biometricSupported() {
+      return (
+        biometricApiSupported() &&
+        platformAuthenticatorAvailable
       );
     }
 
@@ -504,14 +675,21 @@
     }
 
 
-    async function enableBiometric(
+    async function completeBiometricSetup(
       data
     ) {
-      if (!biometricSupported()) {
+      const available =
+        await detectPlatformAuthenticator();
+
+      if (!available) {
+        biometricSetupMessage.textContent =
+          "This browser/device is not reporting a fingerprint, face or other secure platform authenticator.";
+
         sendBiometricStatus(
-          "Biometric/device unlock is not available on this browser.",
+          "Biometric/device unlock is not available on this device/browser.",
           false
         );
+
         return;
       }
 
@@ -612,8 +790,20 @@
           true
         );
       } catch (error) {
+        const name =
+          error && error.name
+            ? error.name
+            : "Error";
+
+        biometricSetupMessage.textContent =
+          "Setup did not complete (" +
+          name +
+          "). You can try again.";
+
         sendBiometricStatus(
-          "Biometric setup was cancelled or could not be completed.",
+          "Biometric setup did not complete (" +
+          name +
+          ").",
           false
         );
       }
@@ -718,6 +908,12 @@
     }
 
 
+    detectPlatformAuthenticator()
+      .then(function() {
+        sendBiometricStatus();
+      });
+
+
     if (!isConfigured) {
       loadingScreen.style.display =
         "none";
@@ -761,6 +957,58 @@
         appFrame.style.display = "block";
       }, 1500);
     }
+
+
+    confirmBiometricSetupButton.addEventListener(
+      "click",
+      async function() {
+        if (!pendingBiometricSetup) {
+          biometricSetupMessage.textContent =
+            "Please return to the rota and start biometric setup again.";
+          return;
+        }
+
+        confirmBiometricSetupButton.disabled =
+          true;
+
+        confirmBiometricSetupButton.textContent =
+          "WAITING FOR DEVICE...";
+
+        biometricSetupMessage.textContent =
+          "Follow your fingerprint, face or screen-lock prompt.";
+
+        await completeBiometricSetup(
+          pendingBiometricSetup
+        );
+
+        if (biometricEnabled()) {
+          biometricSetupScreen.style.display =
+            "none";
+
+          pendingBiometricSetup = null;
+        }
+
+        confirmBiometricSetupButton.disabled =
+          false;
+
+        confirmBiometricSetupButton.textContent =
+          "ENABLE FINGERPRINT / DEVICE UNLOCK";
+      }
+    );
+
+
+    cancelBiometricSetupButton.addEventListener(
+      "click",
+      function() {
+        pendingBiometricSetup = null;
+
+        biometricSetupMessage.textContent =
+          "";
+
+        biometricSetupScreen.style.display =
+          "none";
+      }
+    );
 
 
     window.setTimeout(function() {
@@ -863,7 +1111,21 @@
           data.type ===
           "TF_ROTA_ENABLE_BIOMETRIC"
         ) {
-          enableBiometric(data);
+          pendingBiometricSetup = {
+            token:
+              String(data.token || ""),
+            staffId:
+              String(data.staffId || ""),
+            displayName:
+              String(data.displayName || "")
+          };
+
+          biometricSetupMessage.textContent =
+            "";
+
+          biometricSetupScreen.style.display =
+            "flex";
+
           return;
         }
 
@@ -891,7 +1153,11 @@
           data.type ===
           "TF_ROTA_BIOMETRIC_UNLOCK_REQUEST"
         ) {
-          performBiometricUnlock();
+          unlockMessage.textContent =
+            "";
+
+          unlockScreen.style.display =
+            "flex";
         }
       }
     );
