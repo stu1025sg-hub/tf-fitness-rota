@@ -1,4 +1,4 @@
-const CACHE_NAME = "tf-rota-shell-v3";
+const CACHE_NAME = "tf-rota-shell-v4";
 
 const SHELL_FILES = [
   "./",
