@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta name="theme-color" content="#0b0b0b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+  >
+  <meta name="apple-mobile-web-app-title" content="TF Rota">
+
+  <title>TF Fitness Rota</title>
+
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon-192.png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+
+  <style>
+    :root {
+      --black: #0b0b0b;
+      --panel: #171717;
+      --yellow: #f4c430;
+      --white: #ffffff;
+      --muted: #b8b8b8;
+      --border: #343434;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--black);
+      color: var(--white);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    #appFrame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: var(--black);
+    }
+
+    #setupScreen,
+    #loadingScreen {
+      width: 100%;
+      height: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: var(--black);
+    }
+
+    #loadingScreen {
+      display: flex;
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+    }
+
+    .setup-card {
+      width: 100%;
+      max-width: 520px;
+      padding: 26px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      text-align: center;
+    }
+
+    .logo {
+      width: min(240px, 72vw);
+      max-height: 180px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 18px;
+    }
+
+    .loading-logo {
+      width: min(220px, 65vw);
+      max-height: 165px;
+      object-fit: contain;
+      display: block;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      color: var(--yellow);
+      font-size: 26px;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    code {
+      color: var(--white);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loadingScreen">
+    <img
+      class="loading-logo"
+      src="./tf-fitness-logo.png"
+      alt="TF Fitness"
+    >
+  </div>
+
+  <iframe
+    id="appFrame"
+    title="TF Fitness Staff Rota"
+    allow="fullscreen; clipboard-read; clipboard-write"
+  ></iframe>
+
+  <div id="setupScreen">
+    <div class="setup-card">
+      <img
+        class="logo"
+        src="./tf-fitness-logo.png"
+        alt="TF Fitness"
+      >
+
+      <h1>TF Fitness Rota</h1>
+
+      <p>
+        Setup is almost complete. Open <code>config.js</code> and replace
+        the placeholder with your existing Google Apps Script Web App URL.
+      </p>
+    </div>
+  </div>
+
+  <script src="./config.js"></script>
+
+  <script>
+    const APP_URL =
+      String(window.TF_ROTA_APP_URL || "").trim();
+
+    const appFrame =
+      document.getElementById("appFrame");
+
+    const setupScreen =
+      document.getElementById("setupScreen");
+
+    const loadingScreen =
+      document.getElementById("loadingScreen");
+
+    const isConfigured =
+      APP_URL &&
+      !APP_URL.includes(
+        "PASTE_YOUR_EXISTING_ROTA_WEB_APP_URL_HERE"
+      );
+
+    if (!isConfigured) {
+      loadingScreen.style.display = "none";
+      appFrame.style.display = "none";
+      setupScreen.style.display = "flex";
+    } else {
+      appFrame.addEventListener(
+        "load",
+        function() {
+          loadingScreen.style.display = "none";
+        }
+      );
+
+      appFrame.src = APP_URL;
+
+      window.setTimeout(
+        function() {
+          loadingScreen.style.display = "none";
+        },
+        7000
+      );
+    }
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener(
+        "load",
+        function() {
+          navigator.serviceWorker
+            .register("./service-worker.js")
+            .catch(function(error) {
+              console.error(
+                "Service worker registration failed:",
+                error
+              );
+            });
+        }
+      );
+    }
+  </script>
+</body>
+</html>
