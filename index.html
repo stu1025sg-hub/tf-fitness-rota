@@ -67,10 +67,11 @@
     }
 
     #loadingScreen {
-      display: flex;
+      display: none;
       position: fixed;
       inset: 0;
       z-index: 10;
+      pointer-events: none;
     }
 
     .setup-card {
@@ -220,6 +221,44 @@
     </div>
   </div>
 
+
+  <div
+    id="frameFallback"
+    style="
+      display:none;
+      position:fixed;
+      left:12px;
+      right:12px;
+      bottom:12px;
+      z-index:30;
+      background:#171717;
+      border:1px solid #343434;
+      border-radius:12px;
+      padding:12px;
+      color:#fff;
+      font-family:Arial,Helvetica,sans-serif;
+      font-size:13px;
+      line-height:1.4;
+    "
+  >
+    The rota is taking longer than expected to load.
+    <button
+      id="openDirectRotaButton"
+      type="button"
+      style="
+        margin-left:8px;
+        border:0;
+        border-radius:8px;
+        background:#f4c430;
+        color:#000;
+        padding:8px 10px;
+        font-weight:900;
+      "
+    >
+      OPEN ROTA
+    </button>
+  </div>
+
   <iframe
     id="appFrame"
     title="TF Fitness Staff Rota"
@@ -278,6 +317,12 @@
 
     const unlockMessage =
       document.getElementById("unlockMessage");
+
+    const frameFallback =
+      document.getElementById("frameFallback");
+
+    const openDirectRotaButton =
+      document.getElementById("openDirectRotaButton");
 
     let frameReady = false;
 
@@ -688,6 +733,15 @@
         function() {
           frameReady = true;
 
+          frameFallback.style.display =
+            "none";
+
+          loadingScreen.style.display =
+            "none";
+
+          appFrame.style.display =
+            "block";
+
           sendShellReady();
 
           window.setTimeout(
@@ -697,8 +751,36 @@
         }
       );
 
+      appFrame.style.display = "block";
+      loadingScreen.style.display = "none";
       appFrame.src = APP_URL;
+
+      // Safety fallback: never leave the user stuck behind a splash screen.
+      window.setTimeout(function() {
+        loadingScreen.style.display = "none";
+        appFrame.style.display = "block";
+      }, 1500);
     }
+
+
+    window.setTimeout(function() {
+      if (
+        isConfigured &&
+        !frameReady
+      ) {
+        frameFallback.style.display =
+          "block";
+      }
+    }, 8000);
+
+
+    openDirectRotaButton.addEventListener(
+      "click",
+      function() {
+        window.location.href =
+          APP_URL;
+      }
+    );
 
 
     unlockButton.addEventListener(
