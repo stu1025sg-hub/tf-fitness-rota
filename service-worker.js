@@ -1,4 +1,4 @@
-const CACHE_NAME = "tf-rota-shell-v5";
+const CACHE_NAME = "tf-rota-shell-v7";
 
 const SHELL_FILES = [
   "./",
@@ -54,36 +54,6 @@ self.addEventListener("fetch", function(event) {
 
   // The live Google Apps Script app stays online and uncached.
   if (url.origin !== self.location.origin) {
-    return;
-  }
-
-  // Always try the latest page shell first so app updates
-  // do not get stuck behind an old installed version.
-  if (
-    request.mode === "navigate" ||
-    url.pathname.endsWith("/index.html")
-  ) {
-    event.respondWith(
-      fetch(request)
-        .then(function(response) {
-          const copy = response.clone();
-
-          caches
-            .open(CACHE_NAME)
-            .then(function(cache) {
-              cache.put(request, copy);
-            });
-
-          return response;
-        })
-        .catch(function() {
-          return (
-            caches.match(request) ||
-            caches.match("./offline.html")
-          );
-        })
-    );
-
     return;
   }
 
