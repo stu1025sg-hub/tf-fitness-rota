@@ -141,6 +141,131 @@
     .security-link { border:0; background:transparent; color:#b8b8b8; padding:9px 12px; }
     .security-message { min-height:20px; margin-top:12px; color:#b8b8b8; font-size:13px; line-height:1.4; }
 
+
+    /* v1.4 - LIVE / TRAINING SWITCH */
+
+    #environmentBar {
+      display: none;
+      position: fixed;
+      z-index: 35;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 54px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding:
+        max(7px, env(safe-area-inset-top))
+        12px
+        7px;
+      background: #111111;
+      border-bottom: 1px solid #343434;
+    }
+
+    #environmentBar.training {
+      background: #2b2100;
+      border-bottom-color: #f4c430;
+    }
+
+    .environment-status {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .environment-dot {
+      width: 10px;
+      height: 10px;
+      flex: 0 0 auto;
+      border-radius: 999px;
+      background: #73d99a;
+    }
+
+    #environmentBar.training
+    .environment-dot {
+      background: #f4c430;
+    }
+
+    .environment-copy {
+      min-width: 0;
+    }
+
+    #environmentTitle {
+      color: #ffffff;
+      font-size: 12px;
+      line-height: 1.1;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+    }
+
+    #environmentSubtitle {
+      margin-top: 2px;
+      color: #b8b8b8;
+      font-size: 10px;
+      line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #environmentBar.training
+    #environmentTitle {
+      color: #f4c430;
+    }
+
+    .environment-switch {
+      flex: 0 0 auto;
+      display: inline-flex;
+      gap: 3px;
+      padding: 3px;
+      border: 1px solid #343434;
+      border-radius: 10px;
+      background: #090909;
+    }
+
+    .environment-button {
+      border: 0;
+      border-radius: 7px;
+      padding: 8px 10px;
+      background: transparent;
+      color: #b8b8b8;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .environment-button.active {
+      background: #f4c430;
+      color: #000000;
+    }
+
+    #appFrame.environment-visible {
+      position: absolute;
+      top: 54px;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 54px);
+    }
+
+    @media (max-width: 430px) {
+      #environmentBar {
+        gap: 7px;
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+
+      #environmentSubtitle {
+        display: none;
+      }
+
+      .environment-button {
+        padding: 8px 8px;
+        font-size: 10px;
+      }
+    }
+
   </style>
 </head>
 
@@ -180,6 +305,44 @@
     </div>
   </div>
 
+
+  <div id="environmentBar">
+    <div class="environment-status">
+      <span class="environment-dot"></span>
+
+      <div class="environment-copy">
+        <div id="environmentTitle">
+          LIVE SYSTEM
+        </div>
+
+        <div id="environmentSubtitle">
+          Real TF Fitness rota data
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="environment-switch"
+      aria-label="Choose rota environment"
+    >
+      <button
+        id="liveEnvironmentButton"
+        class="environment-button active"
+        type="button"
+      >
+        LIVE
+      </button>
+
+      <button
+        id="trainingEnvironmentButton"
+        class="environment-button"
+        type="button"
+      >
+        TRAINING
+      </button>
+    </div>
+  </div>
+
   <iframe
     id="appFrame"
     title="TF Fitness Staff Rota"
@@ -197,8 +360,9 @@
       <h1>TF Fitness Rota</h1>
 
       <p>
-        Setup is almost complete. Open <code>config.js</code> and replace
-        the placeholder with your existing Google Apps Script Web App URL.
+        Setup is almost complete. Check <code>config.js</code> contains
+        the LIVE Google Apps Script URL. Training Mode can be added with a
+        second Training URL.
       </p>
     </div>
   </div>
@@ -206,7 +370,16 @@
   <script src="./config.js"></script>
 
   <script>
-    const APP_URL = String(window.TF_ROTA_APP_URL || "").trim();
+    const LIVE_URL =
+      String(
+        window.TF_ROTA_APP_URL || ""
+      ).trim();
+
+    const TRAINING_URL =
+      String(
+        window.TF_ROTA_TRAINING_URL || ""
+      ).trim();
+
     const BIO_ENABLED_KEY = "tfRotaBiometricGateEnabled";
     const BIO_CREDENTIAL_KEY = "tfRotaBiometricGateCredential";
     const BIO_PROMPT_KEY = "tfRotaBiometricPromptSeen";
@@ -223,7 +396,35 @@
     const biometricGateMessage = document.getElementById("biometricGateMessage");
     const biometricSetupMessage = document.getElementById("biometricSetupMessage");
 
-    const isConfigured = APP_URL && !APP_URL.includes("PASTE_YOUR_EXISTING_ROTA_WEB_APP_URL_HERE");
+    const environmentBar =
+      document.getElementById("environmentBar");
+
+    const environmentTitle =
+      document.getElementById("environmentTitle");
+
+    const environmentSubtitle =
+      document.getElementById("environmentSubtitle");
+
+    const liveEnvironmentButton =
+      document.getElementById("liveEnvironmentButton");
+
+    const trainingEnvironmentButton =
+      document.getElementById("trainingEnvironmentButton");
+
+    let currentEnvironment =
+      "LIVE";
+
+    const isConfigured =
+      LIVE_URL &&
+      !LIVE_URL.includes(
+        "PASTE_YOUR_EXISTING_ROTA_WEB_APP_URL_HERE"
+      );
+
+    const trainingConfigured =
+      TRAINING_URL &&
+      !TRAINING_URL.includes(
+        "PASTE_YOUR_TRAINING_WEB_APP_URL_HERE"
+      );
 
     function apiAvailable() {
       return window.isSecureContext && "PublicKeyCredential" in window && navigator.credentials;
@@ -267,10 +468,26 @@
     }
 
     function revealRota() {
-      biometricGate.style.display = "none";
-      biometricSetup.style.display = "none";
-      loadingScreen.style.display = "none";
-      appFrame.style.display = "block";
+      biometricGate.style.display =
+        "none";
+
+      biometricSetup.style.display =
+        "none";
+
+      loadingScreen.style.display =
+        "none";
+
+      environmentBar.style.display =
+        "flex";
+
+      appFrame.classList.add(
+        "environment-visible"
+      );
+
+      appFrame.style.display =
+        "block";
+
+      updateEnvironmentUi();
     }
 
     async function createBiometricCredential() {
@@ -310,6 +527,156 @@
       if (!assertion) throw new Error("Device unlock did not complete.");
       revealRota();
     }
+
+    function getEnvironmentUrl(
+      environment
+    ) {
+      return environment ===
+        "TRAINING"
+          ? TRAINING_URL
+          : LIVE_URL;
+    }
+
+
+    function updateEnvironmentUi() {
+      const training =
+        currentEnvironment ===
+        "TRAINING";
+
+      environmentBar
+        .classList
+        .toggle(
+          "training",
+          training
+        );
+
+      liveEnvironmentButton
+        .classList
+        .toggle(
+          "active",
+          !training
+        );
+
+      trainingEnvironmentButton
+        .classList
+        .toggle(
+          "active",
+          training
+        );
+
+      environmentTitle.textContent =
+        training
+          ? "TRAINING MODE — NO LIVE DATA"
+          : "LIVE SYSTEM";
+
+      environmentSubtitle.textContent =
+        training
+          ? "Safe practice / demonstration data"
+          : "Real TF Fitness rota data";
+
+      trainingEnvironmentButton.disabled =
+        !trainingConfigured;
+
+      trainingEnvironmentButton.title =
+        trainingConfigured
+          ? "Switch to Training Mode"
+          : "Training URL has not been configured";
+    }
+
+
+    function switchEnvironment(
+      environment
+    ) {
+      environment =
+        environment ===
+          "TRAINING"
+          ? "TRAINING"
+          : "LIVE";
+
+      if (
+        environment ===
+          currentEnvironment
+      ) {
+        return;
+      }
+
+      if (
+        environment ===
+          "TRAINING" &&
+        !trainingConfigured
+      ) {
+        window.alert(
+          "Training Mode has not been configured yet."
+        );
+
+        return;
+      }
+
+      if (
+        environment ===
+          "TRAINING"
+      ) {
+        const confirmed =
+          window.confirm(
+            "Switch to TRAINING MODE?\\n\\n" +
+            "Training uses separate practice data and does not affect the live rota."
+          );
+
+        if (!confirmed) {
+          return;
+        }
+      }
+
+      currentEnvironment =
+        environment;
+
+      updateEnvironmentUi();
+
+      appFrame.style.display =
+        "none";
+
+      loadingScreen.style.display =
+        "flex";
+
+      appFrame.src =
+        getEnvironmentUrl(
+          currentEnvironment
+        );
+
+      window.setTimeout(
+        function() {
+          loadingScreen.style.display =
+            "none";
+
+          appFrame.style.display =
+            "block";
+        },
+        900
+      );
+    }
+
+
+    liveEnvironmentButton
+      .addEventListener(
+        "click",
+        function() {
+          switchEnvironment(
+            "LIVE"
+          );
+        }
+      );
+
+
+    trainingEnvironmentButton
+      .addEventListener(
+        "click",
+        function() {
+          switchEnvironment(
+            "TRAINING"
+          );
+        }
+      );
+
 
     setupBiometricButton.addEventListener("click", async function() {
       setupBiometricButton.disabled = true;
@@ -363,7 +730,11 @@
         return;
       }
 
-      appFrame.src = APP_URL;
+      currentEnvironment =
+        "LIVE";
+
+      appFrame.src =
+        LIVE_URL;
 
       if (biometricEnabled()) {
         appFrame.style.display = "none";
